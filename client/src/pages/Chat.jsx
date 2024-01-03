@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -33,9 +34,14 @@ export default function Chat() {
   }, [currentUser]);
 
   useEffect(async () => {
+    const authToken = localStorage.getItem('token');
     if (currentUser) {
       if (currentUser.isAvatarImageSet) {
-        const data = await axios.get(`${allUsersRoute}/${currentUser.id}`);
+        const data = await axios.get(`${allUsersRoute}/${currentUser.id}`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
         setContacts(data.data);
       } else {
         navigate("/setAvatar");

@@ -33,9 +33,20 @@ export default function SetAvatar() {
       const user = await JSON.parse(
         localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
       );
-      const { data } = await axios.post(`${setAvatarRoute}/${user.id}`, {
-        image: avatars[selectedAvatar],
-      });
+      const authToken = localStorage.getItem('token');
+
+      // Now, include the Bearer token in the headers of your axios request
+      const { data } = await axios.post(
+        `${setAvatarRoute}/${user.id}`,
+        {
+          image: avatars[selectedAvatar],
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
 
       if (data.isSet) {
         user.isAvatarImageSet = true;

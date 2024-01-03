@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import ChatInput from "./ChatInput";
@@ -15,11 +16,20 @@ export default function ChatContainer({ currentChat, socket }) {
     const data = await JSON.parse(
       localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
     );
-    const response = await axios.post(recieveMessageRoute, {
-      from: data.id,
-      to: currentChat.id,
-    });
-    console.log("dataaaaaaaaaaaaaaaaaaaa", data);
+    const authToken = localStorage.getItem('token');
+    // Now, include the Bearer token in the headers of your axios request
+    const response = await axios.post(
+      recieveMessageRoute,
+      {
+        from: data.id,
+        to: currentChat.id,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      }
+    )
     setMessages(response.data);
   }, [currentChat]);
 
@@ -43,11 +53,23 @@ export default function ChatContainer({ currentChat, socket }) {
       from: data.id,
       msg,
     });
-    await axios.post(sendMessageRoute, {
-      from: data.id,
-      to: currentChat.id,
-      message: msg,
-    });
+
+    const authToken = localStorage.getItem('token');
+
+    // Now, include the Bearer token in the headers of your axios request
+    await axios.post(
+      sendMessageRoute,
+      {
+        from: data.id,
+        to: currentChat.id,
+        message: msg,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      }
+    );
 
     const msgs = [...messages];
     msgs.push({ fromSelf: true, message: msg });

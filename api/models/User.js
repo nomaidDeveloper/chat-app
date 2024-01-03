@@ -6,9 +6,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false,
             unique: true,
-            validate: {
-                len: [3, 20],
-            },
+           
         },
         email: {
             type: DataTypes.STRING,
@@ -31,6 +29,14 @@ module.exports = (sequelize, DataTypes) => {
         },
         avatarImage: {
             type: DataTypes.TEXT,
+            defaultValue: '',
+        },
+
+        phone: {
+        type: DataTypes.STRING,
+        },
+        gender: {
+            type: DataTypes.STRING,
             defaultValue: '',
         },
     });

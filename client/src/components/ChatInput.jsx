@@ -33,16 +33,16 @@ export default function ChatInput({ handleSendMsg }) {
     formData.append("file", file);
 
     // Replace the URL with your actual API endpoint
-    axios.post("https://your-api-endpoint/upload", formData)
-      .then(response => {
-        // Handle the response from the server
-        console.log("File uploaded successfully:", response.data.url);
-        setAttachment(response.data.url);
-      })
-      .catch(error => {
-        // Handle errors
-        console.error("Error uploading file:", error);
-      });
+    // axios.post("https://your-api-endpoint/upload", formData)
+    //   .then(response => {
+    //     // Handle the response from the server
+    //     console.log("File uploaded successfully:", response.data.url);
+    //     setAttachment(response.data.url);
+    //   })
+    //   .catch(error => {
+    //     // Handle errors
+    //     console.error("Error uploading file:", error);
+    //   });
   };
 
   const sendChat = (event) => {

@@ -10,8 +10,13 @@ export default function Logout() {
     const id = await JSON.parse(
       localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
     ).id;
-    const data = await axios.get(`${logoutRoute}/${id}`);
-    if (data.status === 200) {
+    const authToken = localStorage.getItem('token');
+
+    const data = await axios.get(`${logoutRoute}/${id}`, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });    if (data.status === 200) {
       localStorage.clear();
       navigate("/login");
     }

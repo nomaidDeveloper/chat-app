@@ -12,17 +12,7 @@ module.exports.getMessages = async (req, res, next) => {
             order: [['updatedAt', 'ASC']],
             raw: true,
         });
-        // const messages = await Message.findAll({
-        //     where: {
-        //         users: {
-        //             [Sequelize.Op.and]: [
-        //                 { [Sequelize.Op.contains]: [from] },
-        //                 { [Sequelize.Op.contains]: [to] },
-        //             ],
-        //         },
-        //     },
-        //     order: [['updatedAt', 'ASC']],
-        // });
+      
         const projectedMessages = messages.map((msg) => {
             return {
                 fromSelf: msg.senderId === from,

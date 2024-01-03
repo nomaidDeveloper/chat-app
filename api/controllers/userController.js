@@ -1,24 +1,31 @@
 const { User } = require('../db');
 const bcrypt = require('bcrypt');
 const { Op } = require('sequelize')
+const jwt = require('jsonwebtoken');
+
 
 module.exports.login = async (req, res, next) => {
     try {
-        const { username, password } = req.body;
-        const user = await User.findOne({ where: { username } });
+        const { email, password } = req.body;
+        const user = await User.findOne({ where: { email } });
 
         if (!user)
-            return res.json({ msg: 'Incorrect Username or Password', status: false });
+            return res.json({ msg: 'Incorrect email or Password', status: false });
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid)
-            return res.json({ msg: 'Incorrect Username or Password', status: false });
-
+            return res.json({ msg: 'Incorrect email or Password', status: false });
+            
+            const token = jwt.sign(
+                { userId: user.id, email: user.email },
+                'mysecrety_key',
+                { expiresIn: '8h' } // You can adjust the expiration time as needed
+              );
         // Omit password from the response
         const { password: _, ...userDataWithoutPassword } = user.get();
 
-        return res.json({ status: true, user: userDataWithoutPassword });
+        return res.json({ status: true, user: userDataWithoutPassword,token:token });
     } catch (ex) {
         next(ex);
     }
@@ -26,7 +33,7 @@ module.exports.login = async (req, res, next) => {
 
 module.exports.register = async (req, res, next) => {
     try {
-        const { username, email, password } = req.body;
+        const { username, email, password,phone,gender } = req.body;
 
         const usernameCheck = await User.findOne({ where: { username } });
         if (usernameCheck)
@@ -41,12 +48,18 @@ module.exports.register = async (req, res, next) => {
             email,
             username,
             password: hashedPassword,
+            phone,
+            gender
         });
 
         // Omit password from the response
         const { password: _, ...userDataWithoutPassword } = user.get();
-
-        return res.json({ status: true, user: userDataWithoutPassword });
+        const token = jwt.sign(
+            { userId: user.id, email: user.email },
+            'mysecrety_key',
+            { expiresIn: '8h' } // You can adjust the expiration time as needed
+          );
+        return res.json({ status: true, user: userDataWithoutPassword,token:token });
     } catch (ex) {
         next(ex);
     }
@@ -71,7 +84,6 @@ module.exports.setAvatar = async (req, res, next) => {
     try {
         const userId = req.params.id;
         const avatarImage = req.body.image;
-        console.log("reqqqqqqqqqqqq", req.params, avatarImage)
         // const [rowsAffected, [updatedUser]] = await User.update(
         //     {
         //         isAvatarImageSet: true,

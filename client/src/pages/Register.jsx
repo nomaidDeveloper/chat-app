@@ -20,10 +20,11 @@ export default function Register() {
   };
 
   const handleValidation = (data) => {
-    const { password, confirmPassword, username, email } = data;
+    const { password, confirmPassword, username, email, phone, gender } = data;
+
     if (password !== confirmPassword) {
       toast.error(
-        "Password and confirm password should be same.",
+        "Password and confirm password should be the same.",
         toastOptions
       );
       return false;
@@ -42,6 +43,12 @@ export default function Register() {
     } else if (email === "") {
       toast.error("Email is required.", toastOptions);
       return false;
+    } else if (phone === "") {
+      toast.error("Phone is required.", toastOptions);
+      return false;
+    } else if (gender === "") {
+      toast.error("Gender is required.", toastOptions);
+      return false;
     }
 
     return true;
@@ -50,16 +57,19 @@ export default function Register() {
   const onSubmit = async (data) => {
     if (handleValidation(data)) {
       try {
-        const { email, username, password } = data;
+        const { email, username, password, phone, gender } = data;
         const response = await axios.post(registerRoute, {
           username,
           email,
           password,
+          phone,
+          gender,
         });
 
         if (response.data.status === false) {
           toast.error(response.data.msg, toastOptions);
         } else if (response.data.status === true) {
+          localStorage.setItem('token', response.data.token);
           localStorage.setItem(
             process.env.REACT_APP_LOCALHOST_KEY,
             JSON.stringify(response.data.user)
@@ -111,6 +121,22 @@ export default function Register() {
           />
           {errors.confirmPassword && (
             <span className="error">Confirm Password is required (min. 8 characters).</span>
+          )}
+          <input
+            type="text"
+            placeholder="Phone"
+            {...register("phone", { required: true })}
+          />
+          {errors.phone && (
+            <span className="error">Phone is required.</span>
+          )}
+          <input
+            type="text"
+            placeholder="Gender"
+            {...register("gender", { required: true })}
+          />
+          {errors.gender && (
+            <span className="error">Gender is required.</span>
           )}
           <button type="submit">Create User</button>
           <span>

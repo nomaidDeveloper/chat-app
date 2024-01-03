@@ -3,16 +3,20 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import styled from "styled-components";
 import { useNavigate, Link } from "react-router-dom";
-import Logo from "../assets/logo1.svg";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { loginRoute } from "../utils/APIRoutes";
+import Logo from "../assets/logo1.svg";
 
 export default function Login() {
   const navigate = useNavigate();
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
     defaultValues: {
-      username: "",
+      email: "",
       password: "",
     },
   });
@@ -32,12 +36,21 @@ export default function Login() {
 
   const onSubmit = async (data) => {
     try {
-      const { username, password } = data;
-      const response = await axios.post(loginRoute, { username, password });
+      const { email, password } = data;
+
+      // Validate email format using a regular expression
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        toast.error("Invalid email format", toastOptions);
+        return;
+      }
+
+      const response = await axios.post(loginRoute, { email, password });
 
       if (response.data.status === false) {
         toast.error(response.data.msg, toastOptions);
       } else if (response.data.status === true) {
+        localStorage.setItem('token',response.data.token)
         localStorage.setItem(
           process.env.REACT_APP_LOCALHOST_KEY,
           JSON.stringify(response.data.user)
@@ -59,21 +72,17 @@ export default function Login() {
           </div>
           <input
             type="text"
-            placeholder="Username"
-            {...register("username", {
-              required: "Username is required.",
-              minLength: {
-                value: 3,
-                message: "Username should be at least 3 characters.",
-              },
-              maxLength: {
-                value: 20,
-                message: "Username should be at most 20 characters.",
+            placeholder="email"
+            {...register("email", {
+              required: "Email is required.",
+              pattern: {
+                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                message: "Invalid email format.",
               },
             })}
           />
-          {errors.username && (
-            <span className="error">{errors.username.message}</span>
+          {errors.email && (
+            <span className="error">{errors.email.message}</span>
           )}
           <input
             type="password"
@@ -103,7 +112,6 @@ export default function Login() {
     </>
   );
 }
-
 
 const FormContainer = styled.div`
   height: 100vh;
@@ -150,9 +158,9 @@ const FormContainer = styled.div`
     }
   }
   .error {
-    color: red; /* Set the error message color to red */
+    color: red;
     font-size: 0.8rem;
-    margin-top: -1rem; /* Adjust margin to avoid extra space */
+    margin-top: -1rem;
   }
   button {
     background-color: #4e0eff;
@@ -178,4 +186,3 @@ const FormContainer = styled.div`
     }
   }
 `;
-
