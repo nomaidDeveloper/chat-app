@@ -32,6 +32,8 @@ module.exports = (sequelize, DataTypes) => {
             defaultValue: '',
         },
 
+        
+
         phone: {
         type: DataTypes.STRING,
         },
